@@ -127,3 +127,21 @@ dmypy.json
 
 # Pyre type checker
 .pyre/
+
+pygeoiga/FE_solvers/data/*.msh
+pygeoiga/FE_solvers/data/*.e
+pygeoiga/FE_solvers/data/*.xml
+pygeoiga/FE_solvers/data/*.h5
+pygeoiga/FE_solvers/data/*.xdmf
+pygeoiga/FE_solvers/data/*.vtu
+pygeoiga/FE_solvers/data/*.vtk
+pygeoiga/FE_solvers/data/*.pvd
+
+tests/chapter_figures/data/*.msh
+tests/chapter_figures/data/*.e
+tests/chapter_figures/data/*.xml
+tests/chapter_figures/data/*.h5
+tests/chapter_figures/data/*.xdmf
+tests/chapter_figures/data/*.vtu
+tests/chapter_figures/data/*.vtk
+tests/chapter_figures/data/*.pvd
