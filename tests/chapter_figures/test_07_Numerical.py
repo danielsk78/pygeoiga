@@ -14,7 +14,7 @@ from pygeoiga.FE_solvers.run_fenics import convert_msh_to_xdmf, run_simulation
 import pygeoiga as gn
 import os
 datapath = os.path.abspath(gn.myPath+"/../tests/chapter_figures/data/") + os.sep
-fig_folder=gn.myPath+'/../../manuscript/Thesis/figures/07_Examples/'
+fig_folder=gn.myPath+'/../manuscript_MasterThesis/Thesis/figures/07_Examples/'
 kwargs_savefig=dict(transparent=True, box_inches='tight', pad_inches=0)
 save_all=False
 
@@ -336,7 +336,7 @@ def test_plot_solution_salt_dome_mp():
              save=save,
              levels=levels)
 
-def test_plot_solution_3_layer_mp():
+def test_plot_solution_3_layer_mp_mesh():
     from pygeoiga.nurb.cad import make_3_layer_patches
     geometry = make_3_layer_patches(refine=True, knot_ins=([0.5], [0.5]))
 

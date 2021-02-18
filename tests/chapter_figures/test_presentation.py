@@ -2,7 +2,7 @@ import pygeoiga as gn
 import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib import rc
-fig_folder=gn.myPath+'/../../../../manuscript/Thesis/figures/04_NURBS'
+fig_folder=gn.myPath+'/../manuscript_MasterThesis/Thesis/figures/04_NURBS'
 dpi=200
 
 def make_plot(control, knot, basis_fun, resol, positions):
