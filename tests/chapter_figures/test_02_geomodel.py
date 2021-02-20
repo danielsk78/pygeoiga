@@ -2,7 +2,7 @@
 import pygeoiga as gn
 import numpy as np
 import matplotlib.pyplot as plt
-fig_folder=gn.myPath+'/../manuscript_IGA_MasterThesis/Thesis/figures/02_Geomodeling/'
+fig_folder=gn.myPath+'/../../manuscript_IGA_MasterThesis/Thesis/figures/02_Geomodeling/'
 kwargs_savefig=dict(transparent=True, box_inches='tight', pad_inches=0)
 save_all=False
 #%%
@@ -243,12 +243,12 @@ def test_show_modifysimple_mesh():
     for count, point in enumerate(P):
         ax.annotate(str(count), point, xytext =(5,5), textcoords="offset points")
 
-    ax.annotate("1", (0.5, 0.5), fontsize=20, xytext =(-5,-5), textcoords="offset points")
-    ax.annotate("2", (1.5, 0.5), fontsize=20, xytext=(-5, -5), textcoords="offset points")
-    ax.annotate("3", (2.5, 0.5), fontsize=20, xytext=(-5, -5), textcoords="offset points")
-    ax.annotate("4", (0.5, 1.5), fontsize=20, xytext=(-5, -5), textcoords="offset points")
-    ax.annotate("5", (1.5, 1.5), fontsize=20, xytext=(-5, -5), textcoords="offset points")
-    ax.annotate("6", (2.5, 1.5), fontsize=20, xytext=(-5, -5), textcoords="offset points")
+    ax.annotate("$\Omega_1$", (0.5, 0.5), fontsize=20, xytext =(-5,-5), textcoords="offset points")
+    ax.annotate("$\Omega_2$", (1.5, 0.5), fontsize=20, xytext=(-5, -5), textcoords="offset points")
+    ax.annotate("$\Omega_3$", (2.5, 0.5), fontsize=20, xytext=(-5, -5), textcoords="offset points")
+    ax.annotate("$\Omega_4$", (0.5, 1.5), fontsize=20, xytext=(-5, -5), textcoords="offset points")
+    ax.annotate("$\Omega_5$", (1.5, 1.5), fontsize=20, xytext=(-5, -5), textcoords="offset points")
+    ax.annotate("$\Omega_6$", (2.5, 1.5), fontsize=20, xytext=(-5, -5), textcoords="offset points")
 
     fig.show()
 
@@ -312,17 +312,17 @@ def test_show_modifysimple_mesh():
     for count, point in enumerate(P):
         ax2.annotate(str(count), point, xytext =(5,5), textcoords="offset points")
 
-    disp = (30,30)
-    ax2.annotate("1", (0.5, 0.5), fontsize=20, xytext=disp, textcoords="offset points")
-    ax2.annotate("2", (1.5, 0.5), fontsize=20, xytext=disp, textcoords="offset points")
-    ax2.annotate("3", (2.5, 0.5), fontsize=20, xytext=disp, textcoords="offset points")
-    ax2.annotate("4", (0.5, 1.5), fontsize=20, xytext=disp, textcoords="offset points")
-    ax2.annotate("5", (1.5, 1.5), fontsize=20, xytext=disp, textcoords="offset points")
-    ax2.annotate("6", (2.5, 1.5), fontsize=20, xytext=disp, textcoords="offset points")
+    disp = (28,30)
+    ax2.annotate("$\Omega_1$", (0.5, 0.5), fontsize=20, xytext=disp, textcoords="offset points")
+    ax2.annotate("$\Omega_2$", (1.5, 0.5), fontsize=20, xytext=disp, textcoords="offset points")
+    ax2.annotate("$\Omega_3$", (2.5, 0.5), fontsize=20, xytext=disp, textcoords="offset points")
+    ax2.annotate("$\Omega_4$", (0.5, 1.5), fontsize=20, xytext=disp, textcoords="offset points")
+    ax2.annotate("$\Omega_5$", (1.5, 1.5), fontsize=20, xytext=disp, textcoords="offset points")
+    ax2.annotate("$\Omega_6$", (2.5, 1.5), fontsize=20, xytext=disp, textcoords="offset points")
 
     fig2.show()
 
-    save = False
+    save = True
     if save or save_all:
         fig.savefig(fig_folder + "mesh_1degree.pdf",  **kwargs_savefig)
         fig2.savefig(fig_folder + "mesh_2degree.pdf", **kwargs_savefig)

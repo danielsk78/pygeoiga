@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import pygeoiga as gn
-fig_folder=gn.myPath+'/../manuscript_IGA_MasterThesis/manuscript/Thesis/figures/06_pyGeoIGA/'
+fig_folder=gn.myPath+'/../../manuscript_IGA_MasterThesis/manuscript/Thesis/figures/06_pyGeoIGA/'
 kwargs_savefig=dict(transparent=True, box_inches='tight', pad_inches=0)
 save_all=False
 

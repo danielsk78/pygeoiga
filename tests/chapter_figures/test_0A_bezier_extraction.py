@@ -3,7 +3,7 @@ import numpy as np
 import matplotlib.pyplot as plt
 from matplotlib import rc
 
-fig_folder=gn.myPath+'/../manuscript_IGA_MasterThesis/Thesis/figures/A_bezier_extraction/'
+fig_folder=gn.myPath+'/../../manuscript_IGA_MasterThesis/Thesis/figures/A_bezier_extraction/'
 kwargs_savefig=dict(transparent=True, box_inches='tight', pad_inches=0)
 save_all=False
 

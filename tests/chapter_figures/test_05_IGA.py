@@ -1,69 +1,75 @@
 import pygeoiga as gn
 import numpy as np
 import matplotlib.pyplot as plt
-fig_folder=gn.myPath+'/../manuscript_IGA_MasterThesis/Thesis/figures/05_IGA/'
+fig_folder=gn.myPath+'/../../manuscript_IGA_MasterThesis/Thesis/figures/05_IGA/'
 kwargs_savefig=dict(transparent=True, box_inches='tight', pad_inches=0)
 save_all=False
 
 
-def test_show_simple_mesh():
+def test_show_simple_mesh_IGA():
     from pygeoiga.plot.nrbplotting_mpl import create_figure, p_cpoints, p_knots, p_curve, p_surface
 
-    cpoints = np.array([[[1, 1], [3,0]],
-                        [[1, 2], [2.5, 2.5]]]
+    cp = np.array([[[0, 0], [3, 0]],
+                   [[0, 2], [3, 2]]]
                   )
-    knots = [[0, 0, 1, 1], [0, 0, 1, 1]]
-
-
-    shape = np.asarray(cpoints.shape)
+    kn1 = [0, 0, 1, 1]
+    kn2= [0, 0, 1, 1]
+    knots=[kn1, kn2]
+    shape = np.asarray(cp.shape)
     shape[-1] = 3  # To include the weights in the last term
     B = np.ones(shape)
-    B[...,:2] = cpoints
-
+    B[..., :2] = cp
     from pygeoiga.nurb.refinement import knot_insertion
-    knots_ins_0 = [1/3, 2/3]
-    B, knots = knot_insertion(B, degree=(1, 1), knots=knots, knots_ins=knots_ins_0, direction=0)
-    knots_ins_1 = [0.5]
-    B, knots = knot_insertion(B, degree=(1, 1), knots=knots, knots_ins=knots_ins_1, direction=1)
+    B, knots = knot_insertion(B, [1, 1], knots, [0.5], 0)
+    B, knots = knot_insertion(B, [1, 1], knots, [1/3, 2/3], 1)
 
     fig, ax = create_figure("2d")
-    #fig, [ax,ax2] = plt.subplots(1,2)
-    #ax.set_axis_off()
     ax.spines["right"].set_visible(False)
     ax.spines["top"].set_visible(False)
-    ax.set_xlabel("$x$")
-    ax.set_ylabel("$y$")
+    ax.set_xlabel("x")
+    ax.set_ylabel("y")
     ax.set_xticks([])
     ax.set_yticks([])
-    ax.set_aspect(0.5)
+
     ax = p_knots(knots, B, ax=ax, dim=2, point=False, line=True, color="black")
     ax = p_cpoints(B, ax=ax, dim=2, color="red", marker="o", point=True, line=False)
     n, m = B.shape[0], B.shape[1]
     P = np.asarray([(B[x, y, 0], B[x, y, 1]) for x in range(n) for y in range(m)])
 
     for count, point in enumerate(P):
-        ax.annotate(str(count), point, xytext=(5, 5), textcoords="offset points")
+        ax.annotate(str(count), point, xytext =(5,5), textcoords="offset points")
 
-    ax.annotate("1", (1.5, 0.9), fontsize=20)
-    ax.annotate("2", (2.5, 0.6), fontsize=20)
-    ax.annotate("3", (1.5, 1.4), fontsize=20)
-    ax.annotate("4", (2.3, 1.3), fontsize=20)
-    ax.annotate("5", (1.5, 1.8), fontsize=20)
-    ax.annotate("6", (2.3, 1.8), fontsize=20)
+    ax.annotate("$\Omega_1$", (0.5, 0.5), fontsize=20, xytext =(-5,-5), textcoords="offset points")
+    ax.annotate("$\Omega_2$", (1.5, 0.5), fontsize=20, xytext=(-5, -5), textcoords="offset points")
+    ax.annotate("$\Omega_3$", (2.5, 0.5), fontsize=20, xytext=(-5, -5), textcoords="offset points")
+    ax.annotate("$\Omega_4$", (0.5, 1.5), fontsize=20, xytext=(-5, -5), textcoords="offset points")
+    ax.annotate("$\Omega_5$", (1.5, 1.5), fontsize=20, xytext=(-5, -5), textcoords="offset points")
+    ax.annotate("$\Omega_6$", (2.5, 1.5), fontsize=20, xytext=(-5, -5), textcoords="offset points")
 
     fig.show()
+
+    knots = [kn1, kn2]
+    shape = np.asarray(cp.shape)
+    shape[-1] = 3  # To include the weights in the last term
+    B = np.ones(shape)
+    B[...,:2] = cp
+
     from pygeoiga.nurb.refinement import degree_elevation
     B, knots = degree_elevation(B, knots, direction=0)
     B, knots = degree_elevation(B, knots, direction=1)
 
+    from pygeoiga.nurb.refinement import knot_insertion
+    B, knots = knot_insertion(B, [2, 2], knots, [0.5], 0)
+    B, knots = knot_insertion(B, [2, 2], knots, [1 / 3, 2 / 3], 1)
+
     fig2, ax2 = create_figure("2d")
+    # ax2.set_axis_off()
     ax2.spines["right"].set_visible(False)
     ax2.spines["top"].set_visible(False)
-    ax2.set_xlabel("$x$")
-    ax2.set_ylabel("$y$")
+    ax2.set_xlabel("x")
+    ax2.set_ylabel("y")
     ax2.set_xticks([])
     ax2.set_yticks([])
-    ax2.set_aspect(0.5)
     ax2 = p_knots(knots, B, ax=ax2, dim=2, point=False, line=True, color="black")
     ax2 = p_cpoints(B, ax=ax2, dim=2, color="red", marker="o", point=True, line=False)
     n, m = B.shape[0], B.shape[1]
@@ -72,20 +78,44 @@ def test_show_simple_mesh():
     for count, point in enumerate(P):
         ax2.annotate(str(count), point, xytext=(5, 5), textcoords="offset points")
 
-    ax2.annotate("1", (1.5, 0.9), fontsize=20, xytext=(20,0), textcoords="offset points")
-    ax2.annotate("2", (2.5, 0.6), fontsize=20, xytext=(10,-10), textcoords="offset points")
-    ax2.annotate("3", (1.5, 1.4), fontsize=20, xytext=(17,6), textcoords="offset points")
-    ax2.annotate("4", (2.3, 1.3), fontsize=20, xytext=(20,10), textcoords="offset points")
-    ax2.annotate("5", (1.5, 1.8), fontsize=20, xytext=(13,15), textcoords="offset points")
-    ax2.annotate("6", (2.3, 1.8), fontsize=20, xytext=(13,15), textcoords="offset points")
+    disp = (28, 30)
+    ax2.annotate("$\Omega_1$", (0.5, 0.5), fontsize=20, xytext=disp, textcoords="offset points")
+    ax2.annotate("$\Omega_2$", (1.5, 0.5), fontsize=20, xytext=disp, textcoords="offset points")
+    ax2.annotate("$\Omega_3$", (2.5, 0.5), fontsize=20, xytext=disp, textcoords="offset points")
+    ax2.annotate("$\Omega_4$", (0.5, 1.5), fontsize=20, xytext=disp, textcoords="offset points")
+    ax2.annotate("$\Omega_5$", (1.5, 1.5), fontsize=20, xytext=disp, textcoords="offset points")
+    ax2.annotate("$\Omega_6$", (2.5, 1.5), fontsize=20, xytext=disp, textcoords="offset points")
 
     fig2.show()
 
-    save = False
+    save = True
     if save or save_all:
         fig.savefig(fig_folder + "NURB_mesh_1_degree.pdf", **kwargs_savefig)
         fig2.savefig(fig_folder + "NURB_mesh_2_degree.pdf", **kwargs_savefig)
 
+
+def test_IEN():
+    from pygeoiga.nurb.cad import make_surface_biquadratic
+    knots, B = make_surface_biquadratic()
+    from pygeoiga.plot.nrbplotting_mpl import create_figure, p_cpoints, p_knots, p_curve, p_surface
+    fig, ax = plt.subplots()
+    ax = p_knots(knots, B, ax=ax, dim=2, point=False, line=True, color="k")
+    ax = p_surface(knots, B, ax=ax, dim=2, color="blue", border=False, alpha=0.5)
+
+    ax = p_cpoints(B, ax=ax, dim=2, color="red", marker="o", point=True, line=False)
+    n, m = B.shape[0], B.shape[1]
+    P = np.asarray([(B[x, y, 0], B[x, y, 1]) for x in range(n) for y in range(m)])
+
+    for count, point in enumerate(P):
+        ax.annotate(str(count), point, xytext=(5, 5), textcoords="offset points")
+
+
+    ax.spines["right"].set_visible(False)
+    ax.spines["top"].set_visible(False)
+    ax.set_xlabel("$x$")
+    ax.set_ylabel("$y$")
+    ax.set_aspect(0.8)
+    fig.show()
 
 def test_make_NURB_biquadratic():
 
@@ -280,7 +310,7 @@ def test_make_mp():
                            color=geometry[patch_id].get("color"), alpha=0.5)
             ax = p_cpoints(geometry[patch_id].get("B"), ax=ax, dim=2, color=geometry[patch_id].get("color"), marker="o",
                            linestyle="-",
-                           point=False, line=True)
+                           point=True, line=True)
             ax2 = p_knots(geometry[patch_id].get("knots"), geometry[patch_id].get("B"), ax=ax2, dim=2, point=False,
                          line=True, color="k")
         ax.set_title("Control net")

@@ -4,7 +4,7 @@ import matplotlib.pyplot as plt
 from matplotlib import rc
 #rc('text', usetex=True)
 #rc('font',**{'family':'sans-serif','sans-serif':['Helvetica']})
-fig_folder=gn.myPath+'/../manuscript_IGA_MasterThesis/Thesis/figures/04_NURBS/'
+fig_folder=gn.myPath+'/../../manuscript_IGA_MasterThesis/Thesis/figures/04_NURBS/'
 kwargs_savefig=dict(transparent=True, box_inches='tight', pad_inches=0)
 save_all=False
 #Generate Bezier curve figure
