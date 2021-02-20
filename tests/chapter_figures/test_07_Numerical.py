@@ -467,7 +467,14 @@ def test_same_fault():
 
 def test_same_dome():
     from pygeoiga.nurb.cad import make_salt_dome
-    geometry = make_salt_dome(refine=True)
+    geometry = make_salt_dome(refine=False)
+    knot_ins = [np.arange(0.1, 1, 0.1), np.arange(0.1, 1, 0.1)]
+    for patch_id in geometry.keys():
+        knots = geometry[patch_id].get("knots")
+        knot_ins[0] = [x for x in knot_ins[0] if x not in knots[0]]
+        knot_ins[1] = [x for x in knot_ins[1] if x not in knots[1]]
+
+    geometry = make_salt_dome(refine=True, knot_ins=knot_ins)
     same_IGA_BEZIER(geometry, 10, 90)
 
 def create_high_resolution_answers(geometry_callable, T_t, T_b, name, size):
@@ -578,7 +585,7 @@ def do_FEM(function, T_t, T_b, knot_ins , size):
                                                                    bot_bc=T_b,
                                                                    geometry=geometry,
                                                                    show=False)
-    return nodal_coordinates, temperature_nodes
+    return nodal_coordinates, temperature_nodes, u
 
 
 def same_IGA_FEM(geometry, T_t, T_b, filepath):
@@ -675,7 +682,8 @@ def comparison_all_meshes(function_callable, T_t, T_b, filepath, size=100, knot_
 
     geometry_IGA, dof_IGA = do_IGA(function_callable, T_t, T_b, knot_ins)
     geometry_BE, dof_BE = do_Bezier(function_callable, T_t, T_b, knot_ins)
-    coor, temp = do_FEM(function_callable, T_t, T_b, knot_ins, size)
+    coor, temp, u_FEM = do_FEM(function_callable, T_t, T_b, knot_ins, size)
+    u_FEM.set_allow_extrapolation(True)
     dof_FEM = temp.shape[0]
 
     from pygeoiga.FE_solvers.run_fenics import read_fenics_solution
@@ -683,8 +691,37 @@ def comparison_all_meshes(function_callable, T_t, T_b, filepath, size=100, knot_
     u.set_allow_extrapolation(True)  # TODO: Not understand when this is needed
 
     fig, [ax_IGA, ax_BE, ax_FEM] = plt.subplots(1,3, sharey=True, figsize=(17,5))
-    cmap = plt.get_cmap("seismic")
-    def geometry_difference(geometry, u, ax):
+    cma = plt.cm.seismic
+    def max_min(IGA, BE, FEM):
+        diff_all = np.array([])
+        for geometry in [IGA, BE]:
+            for patch_id in geometry.keys():
+                x = geometry[patch_id].get("x_sol")
+                y = geometry[patch_id].get("y_sol")
+                m, n = x.shape
+                correct = np.zeros((m, n))
+                for x_i in range(n):
+                    for y_i in range(m):
+                        correct[y_i, x_i] = u(x[y_i, x_i], y[y_i, x_i], 0)
+
+                #err = correct - geometry[patch_id].get("t_sol")
+                err = (correct - geometry[patch_id].get("t_sol"))**2
+                diff_all = np.r_[diff_all, err.ravel()]
+
+        t_fun = np.vectorize(u)
+        val = t_fun(coor[:, 0], coor[:, 1], np.zeros(dof_FEM))
+        erro = val - temp
+        diff_all = np.r_[diff_all, erro.ravel()]
+
+        vmin = np.min(diff_all)
+        vmax = np.max(diff_all)
+        #if vmin == 0:
+        #    vmin = -1e-3
+        #if vmax==0:
+        #    vmax = 1e-3
+        return vmin, vmax
+
+    def geometry_difference(geometry, u, ax, vmin, vmax):
         x_all = np.array([])
         y_all = np.array([])
         diff_all = np.array([])
@@ -698,7 +735,9 @@ def comparison_all_meshes(function_callable, T_t, T_b, filepath, size=100, knot_
                 for y_i in range(m):
                     correct[y_i, x_i] = u(x[y_i, x_i], y[y_i, x_i], 0)
 
-            err = correct - geometry[patch_id].get("t_sol")
+            #err = correct - geometry[patch_id].get("t_sol")
+            err = (correct - geometry[patch_id].get("t_sol")) ** 2
+
             x_all = np.r_[x_all, x.ravel()]
             y_all = np.r_[y_all, y.ravel()]
             diff_all = np.r_[diff_all, err.ravel()]
@@ -706,6 +745,20 @@ def comparison_all_meshes(function_callable, T_t, T_b, filepath, size=100, knot_
 
         vmin = np.min(diff_all)
         vmax = np.max(diff_all)
+        if vmin >= 0:
+            norm = matplotlib.colors.Normalize(vmin=vmin, vmax=vmax)
+            #val = cma(np.linspace(0.5, 1, 256))
+            #cmap = matplotlib.colors.LinearSegmentedColormap.from_list('seismic_2', val)
+        elif vmax <= 0:
+            norm = matplotlib.colors.Normalize(vmin=vmin, vmax=vmax)
+            #val = cma(np.linspace(0, 0.5, 256))
+            #cmap = matplotlib.colors.LinearSegmentedColormap.from_list('seismic_2', val)
+        else:
+            norm = matplotlib.colors.TwoSlopeNorm(vmin=vmin, vcenter=0, vmax=vmax)
+            #cmap = cma
+        cmap = cma
+        mappeable = matplotlib.cm.ScalarMappable(norm=norm, cmap=cmap)
+
         if count == 1:
             ax.contourf(x, y, err, vmin=vmin, vmax=vmax, cmap=cmap, levels=100)
         else:
@@ -714,40 +767,70 @@ def comparison_all_meshes(function_callable, T_t, T_b, filepath, size=100, knot_
         divider = make_axes_locatable(ax)
         #cax = divider.append_axes("right", size="5%", pad="2%")
         cax = divider.append_axes("bottom", size="5%", pad="10%")
-        if vmin==0:
-            vmin = -1e-5
-        if vmax==0:
-            vmax = 1e-5
-            #norm = matplotlib.colors.Normalize(vmin=vmin, vmax=vmax)
-        #else:
-        norm = matplotlib.colors.TwoSlopeNorm(vmin=vmin, vcenter=0, vmax=vmax)
-        mappeable = matplotlib.cm.ScalarMappable(norm=norm, cmap=cmap)
-        cbar = ax.figure.colorbar(mappeable, cax=cax, ax=ax, label="Temperature", orientation="horizontal")
+        cbar = ax.figure.colorbar(mappeable, cax=cax, ax=ax, label="Difference", orientation="horizontal", format='%.0e')
         return ax
-    ax_IGA = geometry_difference(geometry_IGA, u, ax_IGA)
+    vmin, vmax = max_min(geometry_IGA, geometry_BE, u)
+    ax_IGA = geometry_difference(geometry_IGA, u, ax_IGA, vmin, vmax)
     ax_IGA.set_title("%s DoF IGA" %dof_IGA)
-    ax_BE = geometry_difference(geometry_BE, u, ax_BE)
+    ax_BE = geometry_difference(geometry_BE, u, ax_BE,  vmin, vmax)
     ax_BE.set_title("%s DoF Bezier" %dof_BE)
 
-    t_fun = np.vectorize(u)
-    val = t_fun(coor[:,0], coor[:,1], np.zeros(dof_FEM))
-    erro = val - temp
-    vmin=np.min(erro)
-    vmax=np.max(erro)
-    ax_FEM.tricontourf(coor[:,0], coor[:,1], erro, vmin=vmin, vmax=vmax, cmap=cmap, levels =100)
-    ax_FEM.set_title("%s DoF FEM" %dof_FEM)
+    #FEM
+    count=0
+    x_all = np.array([])
+    y_all = np.array([])
+    diff_all = np.array([])
+    for patch_id in geometry_IGA.keys():
+        x = geometry_IGA[patch_id].get("x_sol")
+        y = geometry_IGA[patch_id].get("y_sol")
+        m, n = x.shape
+        correct = np.zeros((m, n))
+        correct_FEM = np.zeros((m, n))
+        for x_i in range(n):
+            for y_i in range(m):
+                correct_FEM[y_i, x_i] = u_FEM(x[y_i, x_i], y[y_i, x_i], 0)
+                correct[y_i, x_i] = u(x[y_i, x_i], y[y_i, x_i], 0)
+        #erro = correct - correct_FEM
+        erro = (correct-correct_FEM)**2
+        diff_all = np.r_[diff_all, erro.ravel()]
+        x_all = np.r_[x_all, x.ravel()]
+        y_all = np.r_[y_all, y.ravel()]
+        count +=1
+    vmin=np.min(diff_all)
+    vmax=np.max(diff_all)
+    #t_fun = np.vectorize(u)
+    #val = t_fun(coor[:,0], coor[:,1], np.zeros(dof_FEM))
+    #erro = (val - temp)**2
+    #vmin = np.min(erro)
+    #vmax = np.max(erro)
+
+    if vmin == 0:
+        norm = matplotlib.colors.Normalize(vmin=vmin, vmax=vmax)
+        #val = cma(np.linspace(0.5, 1, 256))
+        #cmap = matplotlib.colors.LinearSegmentedColormap.from_list('seismic_2', val)
+
+    elif vmax == 0:
+        norm = matplotlib.colors.Normalize(vmin=vmin, vmax=vmax)
+        #val = cma(np.linspace(0, 0.5, 256))
+        #cmap = matplotlib.colors.LinearSegmentedColormap.from_list('seismic_2', val)
+    else:
+        norm = matplotlib.colors.TwoSlopeNorm(vmin=vmin, vcenter=0, vmax=vmax)
+        #cmap = cma
+    cmap = cma
+    # norm = matplotlib.colors.Normalize(vmin=min_p, vmax=max_p, v)
+    if count == 1:
+        ax_FEM.contourf(x, y, erro, vmin=vmin, vmax=vmax, cmap=cmap, levels=100)
+    else:
+        ax_FEM.tricontourf(x_all, y_all, diff_all, vmin=vmin, vmax=vmax, cmap=cmap, levels=100)
+
+    #ax_FEM.tricontourf(coor[:, 0], coor[:, 1], erro, vmin=vmin, vmax=vmax, cmap=cmap, levels=100)
+    ax_FEM.set_title("%s DoF FEM" % dof_FEM)
 
     divider = make_axes_locatable(ax_FEM)
     cax = divider.append_axes("bottom", size="5%", pad="10%")
 
-    if vmin == 0:
-        vmin = -1e-5
-    if vmax == 0:
-        vmax = 1e-5
-    norm = matplotlib.colors.TwoSlopeNorm(vmin=vmin, vcenter=0, vmax=vmax)
-    # norm = matplotlib.colors.Normalize(vmin=min_p, vmax=max_p, v)
     mappeable = matplotlib.cm.ScalarMappable(norm=norm, cmap=cmap)
-    cbar = ax_FEM.figure.colorbar(mappeable, cax=cax, ax=ax_FEM, label="Temperature", orientation="horizontal")
+    cbar = ax_FEM.figure.colorbar(mappeable, cax=cax, ax=ax_FEM, label="Difference", orientation="horizontal", format='%.0e')
     fig.show()
 
 def test_compare_all_meshes_anticline():
@@ -949,11 +1032,11 @@ def test_save_biquadratic_high():
         from pygeoiga.nurb.cad import make_surface_biquadratic
         knots, B = make_surface_biquadratic()
         from pygeoiga.nurb.refinement import knot_insertion
-        knot_ins = [np.arange(0.1, 1, 0.1), np.arange(0.1, 1, 0.1)]
+        to_ins = np.arange(0.1, 1, 0.1)
 
-        knots_ins_0 = knot_ins[0]
+        knots_ins_0 = [x for x in to_ins if x not in knots[0]]
         B, knots = knot_insertion(B, degree=(2, 2), knots=knots, knots_ins=knots_ins_0, direction=0)
-        knots_ins_1 = knot_ins[1]
+        knots_ins_1 = [x for x in to_ins if x not in knots[1]]
         B, knots = knot_insertion(B, degree=(2, 2), knots=knots, knots_ins=knots_ins_1, direction=1)
 
         geometry = dict()
@@ -982,11 +1065,11 @@ def test_compare_all_meshes_biquadratic():
         from pygeoiga.nurb.cad import make_surface_biquadratic
         knots, B = make_surface_biquadratic()
         from pygeoiga.nurb.refinement import knot_insertion
-        knot_ins = [np.arange(0.1, 1, 0.1), np.arange(0.1, 1, 0.1)]
+        to_ins = np.arange(0.1, 1, 0.1)
 
-        knots_ins_0 = knot_ins[0]
+        knots_ins_0 = [x for x in to_ins if x not in knots[0]]
         B, knots = knot_insertion(B, degree=(2, 2), knots=knots, knots_ins=knots_ins_0, direction=0)
-        knots_ins_1 = knot_ins[1]
+        knots_ins_1 = [x for x in to_ins if x not in knots[1]]
         B, knots = knot_insertion(B, degree=(2, 2), knots=knots, knots_ins=knots_ins_1, direction=1)
 
         geometry = dict()
@@ -998,7 +1081,7 @@ def test_compare_all_meshes_biquadratic():
                                "BC": {0: "bot_bc", 2: "top_bc"}}
         return geometry
 
-    size = 0.5
+    size = 0.4
     comparison_all_meshes(create_geom,
                           T_t=10,
                           T_b=25,
@@ -1011,11 +1094,12 @@ def test_compare_all_meshes_biquadratic_fine():
         from pygeoiga.nurb.cad import make_surface_biquadratic
         knots, B = make_surface_biquadratic()
         from pygeoiga.nurb.refinement import knot_insertion
-        knot_ins = [np.arange(0.05, 1, 0.05), np.arange(0.05, 1, 0.05)]
 
-        knots_ins_0 = knot_ins[0]
+        to_ins = np.arange(0.03, 1, 0.03)
+
+        knots_ins_0 = [x for x in to_ins if x not in knots[0]]
         B, knots = knot_insertion(B, degree=(2, 2), knots=knots, knots_ins=knots_ins_0, direction=0)
-        knots_ins_1 = knot_ins[1]
+        knots_ins_1 = [x for x in to_ins if x not in knots[1]]
         B, knots = knot_insertion(B, degree=(2, 2), knots=knots, knots_ins=knots_ins_1, direction=1)
 
         geometry = dict()
@@ -1027,10 +1111,75 @@ def test_compare_all_meshes_biquadratic_fine():
                                "BC": {0: "bot_bc", 2: "top_bc"}}
         return geometry
 
-    size = 0.2
+    size = 0.12
     comparison_all_meshes(create_geom,
                           T_t=10,
                           T_b=25,
                           filepath = datapath + "solution_biquadratic.h5",
+                          size=size,
+                          knot_ins=[np.arange(0.1,1,0.1), np.arange(0.1,1,0.1)])
+
+def test_save_square_high():
+    def create_geom(**kwargs):
+        from pygeoiga.nurb.cad import make_surface_square
+        U, V, B = make_surface_square()
+        knots = [U, V]
+        from pygeoiga.nurb.refinement import knot_insertion
+        to_ins = np.arange(0.1, 1, 0.1)
+
+        knots_ins_0 = [x for x in to_ins if x not in knots[0]]
+        B, knots = knot_insertion(B, degree=(2, 2), knots=knots, knots_ins=knots_ins_0, direction=0)
+        knots_ins_1 = [x for x in to_ins if x not in knots[1]]
+        B, knots = knot_insertion(B, degree=(2, 2), knots=knots, knots_ins=knots_ins_1, direction=1)
+
+        geometry = dict()
+        geometry["quadrat"] = {"B": B,
+                               "knots": knots,
+                               "kappa": 4,
+                               'color': "red",
+                               "position": (1, 1),
+                               "BC": {0: "bot_bc", 2: "top_bc"}}
+        return geometry
+    size = 0.01
+    name = "solution_square"
+    T_t = 10
+    T_b = 25
+    create = True
+
+    if create:
+        create_high_resolution_answers(create_geom, T_t, T_b, name, size)
+
+    from pygeoiga.FE_solvers.run_fenics import read_fenics_solution
+    u, mesh, dofs = read_fenics_solution(datapath + name + ".h5")
+    print(u(0,2,0), dofs)  # dofs = 713526
+
+def test_compare_all_meshes_square():
+    def create_geom(**kwargs):
+        from pygeoiga.nurb.cad import make_surface_square
+        U,V, B = make_surface_square()
+        knots = [U,V]
+        from pygeoiga.nurb.refinement import knot_insertion
+
+        to_ins = np.arange(0.1, 1, 0.1)
+
+        knots_ins_0 = [x for x in to_ins if x not in knots[0]]
+        B, knots = knot_insertion(B, degree=(2, 2), knots=knots, knots_ins=knots_ins_0, direction=0)
+        knots_ins_1 = [x for x in to_ins if x not in knots[1]]
+        B, knots = knot_insertion(B, degree=(2, 2), knots=knots, knots_ins=knots_ins_1, direction=1)
+
+        geometry = dict()
+        geometry["quadrat"] = {"B": B,
+                               "knots": knots,
+                               "kappa": 4,
+                               'color': "red",
+                               "position": (1, 1),
+                               "BC": {0: "bot_bc", 2: "top_bc"}}
+        return geometry
+
+    size = 5
+    comparison_all_meshes(create_geom,
+                          T_t=10,
+                          T_b=25,
+                          filepath = datapath + "solution_square.h5",
                           size=size,
                           knot_ins=[np.arange(0.1,1,0.1), np.arange(0.1,1,0.1)])
