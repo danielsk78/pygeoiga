@@ -1,7 +1,7 @@
 import numpy as np
 import matplotlib.pyplot as plt
 import pygeoiga as gn
-fig_folder=gn.myPath+'/../../manuscript_IGA_MasterThesis/manuscript/Thesis/figures/06_pyGeoIGA/'
+fig_folder=gn.myPath+'/../../manuscript_IGA_MasterThesis/Thesis/figures/06_pyGeoIGA/'
 kwargs_savefig=dict(transparent=True, box_inches='tight', pad_inches=0)
 save_all=False
 
@@ -59,7 +59,7 @@ def test_create_geometry():
 
         fig.show()
 
-        save = False
+        save = True
         if save or save_all:
             fig.savefig(fig_folder + file_name, **kwargs_savefig)
 
@@ -79,13 +79,13 @@ def test_listings():
     def create_three_layer_model():
         # Lower layer control points
         bottom_c = np.array([[[0., 0., 1.], [0., 50., 1.], [0., 100., 1.]],
-                             [[250., 0., 1.], [250., 180., 1.], [250., 360., 1.]],
+                             [[250., 0., 1.], [250., 180., 1.], [250., 250., 1.]],
                              [[500., 0., 1.], [500., 50., 1.], [500., 100., 1.]]])
         knot_b = ([0, 0, 0, 1, 1, 1], [0, 0, 0, 1, 1, 1])  # knot vector (U, V)
 
         # Middle layer control points
         middle_c = np.array([[[0., 100., 1.], [0., 200., 1.], [0., 300., 1.]],
-                             [[250., 360., 1.], [250., 380., 1.], [250., 400., 1.]],
+                             [[250., 250., 1.], [250., 380., 1.], [250., 400., 1.]],
                              [[500., 100., 1.], [500., 200., 1.], [500., 300., 1.]]])
         knot_m = ([0, 0, 0, 1, 1, 1], [0, 0, 0, 1, 1, 1])  # knot vector (U, V)
 
@@ -321,7 +321,7 @@ def test_listings():
 
     a, F = solve(bc, K_glob, F, a)
 
-    from pygeoiga.analysis import map_IGA_elements
+    from pygeoiga.analysis.iga import map_solution_elements
 
     def map_MP_elements(geometry, a):
         for patch_id in geometry.keys():
@@ -338,7 +338,7 @@ def test_listings():
             IEN = geometry[patch_id].get("IEN")  # Connectivity array (element topology)
 
             # Procedure to obtain the coordinate x and y of the temperature value t
-            x_temp, y_temp, t_temp = map_IGA_elements(a_patch, degree, P, nx, ny, n, m, ncp, IEN, W, knots)
+            x_temp, y_temp, t_temp = map_solution_elements(a_patch, degree, P, nx, ny, n, m, ncp, IEN, W, knots)
 
             geometry[patch_id]["x_sol"] = x_temp
             geometry[patch_id]["y_sol"] = y_temp

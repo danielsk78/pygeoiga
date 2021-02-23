@@ -116,7 +116,7 @@ def convert_geometry_mp_to_gmsh(geometry, size=0.5, save_geo = data_path+"temp.g
     n_patches = len(list(geometry.keys()))
     for count, patch_id in enumerate(geometry.keys()):
         # Points are always in 3D in gmsh. Be carefull
-        B = geometry[patch_id].get("B")
+        B = geometry[patch_id].get("B").copy()
         bot = B[:, 0]
         right = B[-1]
         top = np.flipud(B[:, -1])

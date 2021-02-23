@@ -146,7 +146,7 @@ def run_simulation(filepath,
         output_file = HDF5File(MPI.comm_world, filepath.split('.')[0] + "_solution_field.h5", "w")
         output_file.write(u, "solution")
         output_file.close()
-
+    u.set_allow_extrapolation(True)
     return dofs, vals, mesh, u
 
 def read_fenics_solution(filepath):
@@ -173,7 +173,7 @@ def read_fenics_solution(filepath):
     input_file.close()
 
     dofs = V.tabulate_dof_coordinates().reshape(V.dim(), mesh.geometry().dim())  # coordinates of nodes
-
+    U.set_allow_extrapolation(True)
     return U, mesh, dofs.shape[0]
 
 
