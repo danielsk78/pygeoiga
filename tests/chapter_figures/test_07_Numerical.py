@@ -976,9 +976,9 @@ def test_compare_biquadratic():
     from pygeoiga.nurb.refinement import knot_insertion
     knot_ins = [np.arange(0.1,1,0.1), np.arange(0.1,1,0.1)]
 
-    knots_ins_0 = knot_ins[0]
+    knots_ins_0 = [x for x in knot_ins[0] if x not in knots[0]]
     B, knots = knot_insertion(B, degree=(2, 2), knots=knots, knots_ins=knots_ins_0, direction=0)
-    knots_ins_1 = knot_ins[1]
+    knots_ins_1 = [x for x in knot_ins[1] if x not in knots[1]]
     B, knots = knot_insertion(B, degree=(2, 2), knots=knots, knots_ins=knots_ins_1, direction=1)
 
     geometry=dict()
@@ -1023,9 +1023,9 @@ def test_biquadratic_bezier():
     from pygeoiga.nurb.refinement import knot_insertion
     knot_ins = [np.arange(0.1, 1, 0.1), np.arange(0.1, 1, 0.1)]
 
-    knots_ins_0 = knot_ins[0]
+    knots_ins_0 = [x for x in knot_ins[0] if x not in knots[0]]
     B, knots = knot_insertion(B, degree=(2, 2), knots=knots, knots_ins=knots_ins_0, direction=0)
-    knots_ins_1 = knot_ins[1]
+    knots_ins_1 = [x for x in knot_ins[1] if x not in knots[1]]
     B, knots = knot_insertion(B, degree=(2, 2), knots=knots, knots_ins=knots_ins_1, direction=1)
 
     geometry = dict()
