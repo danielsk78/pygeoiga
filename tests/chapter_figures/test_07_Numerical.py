@@ -38,28 +38,28 @@ def plot_IGA(geometry, a, gDoF, figsize=(5,5), file_name="temp.pdf", save=False,
         ymax = y.max() if y.max() > ymax else ymax
 
         ax2 = p_temperature(x, y, t, vmin=np.min(a), vmax=np.max(a), show=False, colorbar=False,
-                                 ax=ax2, point=True, fill=False,
+                            ax=ax2, point=True, fill=False,
                             markersize=25)
 
         ax2 = p_knots(geometry[patch_id].get("knots"),
-                     geometry[patch_id].get("B"),
-                     ax=ax2,
-                     color='k',
-                     dim=2,
-                     point=False,
-                     line=True,
+                      geometry[patch_id].get("B"),
+                      ax=ax2,
+                      color='k',
+                      dim=2,
+                      point=False,
+                      line=True,
                       linestyle="--",
                       linewidth=0.2)
 
         ax3 = p_temperature(x, y, t, vmin=np.min(a), vmax=np.max(a), levels=200, show=False, colorbar=cbar, ax=ax3,
-                               point=False, fill=True, contour=False)
+                            point=False, fill=True, contour=False)
         cbar = False
 
     ax2.set_title("%s DoF"%gDoF)
 
+    ax2.set_ylabel(r"$y$")
     for ax in ax2, ax3:
         ax.set_aspect("equal")
-        ax.set_ylabel(r"$y$")
         ax.set_xlabel(r"$x$")
         ax.set_xlim(xmin,xmax)
         ax.set_ylim(ymin,ymax)
@@ -101,17 +101,17 @@ def plot_fenics(nodal_coordinates, temperature_nodes, figsize=(5,5), file_name="
                             )
 
     ax2 = p_temperature(nodal_coordinates[:, 0],
-                       nodal_coordinates[:, 1],
-                       temperature_nodes,
-                       vmin=temperature_nodes.min(),
-                       vmax=temperature_nodes.max(),
-                       ax=ax2,
-                       point=True,
-                       fill=False,
-                       contour=False,
-                       colorbar=False,
+                        nodal_coordinates[:, 1],
+                        temperature_nodes,
+                        vmin=temperature_nodes.min(),
+                        vmax=temperature_nodes.max(),
+                        ax=ax2,
+                        point=True,
+                        fill=False,
+                        contour=False,
+                        colorbar=False,
                         markersize=25
-                       )
+                        )
 
     if u is not None and geometry is not None:
         for patch_id in geometry.keys():
@@ -137,38 +137,38 @@ def plot_fenics(nodal_coordinates, temperature_nodes, figsize=(5,5), file_name="
 
     else:
         ax3 = p_temperature(nodal_coordinates[:, 0],
-                           nodal_coordinates[:, 1],
-                           temperature_nodes,
-                           vmin=temperature_nodes.min(),
-                           vmax=temperature_nodes.max(),
-                           ax=ax3,
-                           point=False,
-                           fill=True,
-                           contour=False,
-                           colorbar=True,
-                           levels=100)
+                            nodal_coordinates[:, 1],
+                            temperature_nodes,
+                            vmin=temperature_nodes.min(),
+                            vmax=temperature_nodes.max(),
+                            ax=ax3,
+                            point=False,
+                            fill=True,
+                            contour=False,
+                            colorbar=True,
+                            levels=100)
 
 
     for c in ax3.collections:
         c.set_edgecolor("face")
 
     ax3 = p_temperature(nodal_coordinates[:, 0],
-                       nodal_coordinates[:, 1],
-                       temperature_nodes,
-                       vmin=temperature_nodes.min(),
-                       vmax=temperature_nodes.max(),
-                       ax=ax3,
-                       point=False,
-                       fill=False,
-                       contour=True,
-                       colorbar=False,
+                        nodal_coordinates[:, 1],
+                        temperature_nodes,
+                        vmin=temperature_nodes.min(),
+                        vmax=temperature_nodes.max(),
+                        ax=ax3,
+                        point=False,
+                        fill=False,
+                        contour=True,
+                        colorbar=False,
                         cmap=None,
-                       levels=levels,
+                        levels=levels,
                         linewidths=0.5)
 
+    ax2.set_ylabel(r"$y$")
     for ax in ax2, ax3:
         ax.set_aspect("equal")
-        ax.set_ylabel(r"$y$")
         ax.set_xlabel(r"$x$")
         ax.set_xlim(nodal_coordinates[:, 0].min(),nodal_coordinates[:, 0].max())
         ax.set_ylim(nodal_coordinates[:, 1].min(),nodal_coordinates[:, 1].max())
@@ -366,7 +366,7 @@ def same_IGA_FEM(geometry, T_t, T_b, filepath):
     norm = matplotlib.colors.TwoSlopeNorm(vmin=min_p, vcenter=0, vmax=max_p)
     #norm = matplotlib.colors.Normalize(vmin=min_p, vmax=max_p, v)
     mappeable = matplotlib.cm.ScalarMappable(norm=norm, cmap=cmap)
-    cbar = ax.figure.colorbar(mappeable, cax=cax, ax=ax, label="Temperature")
+    cbar = ax.figure.colorbar(mappeable, cax=cax, ax=ax, label="Temperature [°C]")
 
     fig.show()
 
@@ -375,7 +375,7 @@ def comparison_all_meshes(function_callable, T_t, T_b, filepath, size=100,
                           bezier=True,
                           save=False,
                           name="temp.none",
-                          label="Difference (Solution - "):
+                          label="Difference [°C] (Solution - "):
     import matplotlib
     from mpl_toolkits.axes_grid1 import make_axes_locatable
 
@@ -384,7 +384,7 @@ def comparison_all_meshes(function_callable, T_t, T_b, filepath, size=100,
     geometry_BE, dof_BE = do_Bezier(function_callable, T_t, T_b, knot_ins)
     coor, temp, u_FEM = do_FEM(function_callable, T_t, T_b, knot_ins, size)
     u_FEM.set_allow_extrapolation(True)
-    dof_FEM = temp.shape[0]
+    dof_FEM = len(temp)
 
     from pygeoiga.FE_solvers.run_fenics import read_fenics_solution
     u, mesh, dofs = read_fenics_solution(filepath)
@@ -560,7 +560,7 @@ def comparison_all_meshes(function_callable, T_t, T_b, filepath, size=100,
 
 def test_plot_solution_3_layer_mp():
     from pygeoiga.nurb.cad import make_3_layer_patches
-    save = True
+    save = False
     levels=[11, 12, 14, 17, 20, 22,23, 24]
     T_t = 10
     T_b = 25
@@ -650,7 +650,7 @@ def test_plot_solution_fault_model_mp():
 
 def test_plot_solution_salt_dome_mp():
     from pygeoiga.nurb.cad import make_salt_dome
-    save = True
+    save = False
     levels = [15, 20, 30, 40, 50, 60, 70, 80, 85]
     T_t = 10
     T_b = 90
@@ -1361,11 +1361,11 @@ def test_adaptability_mesh():
 
         geometry_o = dict()
         geometry_o["quadrat"] = {"B": B,
-                               "knots": knots,
-                               "kappa": 4,
-                               'color': "gray",
-                               "position": (1, 1),
-                               "BC": {0: "bot_bc", 2: "top_bc"}}
+                                 "knots": knots,
+                                 "kappa": 4,
+                                 'color': "gray",
+                                 "position": (1, 1),
+                                 "BC": {0: "bot_bc", 2: "top_bc"}}
 
         from pygeoiga.nurb.refinement import knot_insertion
         to_ins = np.arange(0.1, 1, 0.1)
@@ -1443,9 +1443,9 @@ def test_adaptability_mesh():
                                 point=False, fill=True, contour=False)
             cbar = False
 
+        ax1.set_ylabel(r"$y$")
         for ax in ax1, ax2, ax3:
             ax.set_aspect("equal")
-            ax.set_ylabel(r"$y$")
             ax.set_xlabel(r"$x$")
             ax.set_xlim(xmin-0.1, xmax+0.1)
             ax.set_ylim(ymin-0.1, ymax+0.1)
@@ -1478,7 +1478,7 @@ def test_adaptability_mesh():
 
     from pygeoiga.nurb.cad import make_surface_biquadratic
     knots, B = make_surface_biquadratic()
-    save = False
+    save = True
     create_geom(knots, B, save=save, name="original")
     B[-1,-1] = np.array([6,6,1])
     create_geom(knots, B, save=save, name="adapted")

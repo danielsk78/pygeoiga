@@ -63,6 +63,7 @@ def p_temperature(x_pos, y_pos, temperature,
     else:
         vmax = np.max(temperature)
         kwargs["vmax"] = vmax
+    label = kwargs.pop("label", "Temperature [°C]")
     con = None
     sca = None
     color = kwargs.pop("color", None)
@@ -122,13 +123,13 @@ def p_temperature(x_pos, y_pos, temperature,
     if colorbar: # TODO: if using subplots this does not work anymore
         if len(ax.figure.axes) == 1 or cbar is None: #check if already have a colorbar
             if isinstance(ax, Axes3D):
-                cbar = plt.colorbar(con if con is not None else sca, label="Temperature")
+                cbar = plt.colorbar(con if con is not None else sca, label=label)
             else:
                 divider = make_axes_locatable(ax)
                 cax = divider.append_axes("right", size="5%", pad="2%")
                 norm = matplotlib.colors.Normalize(vmin=vmin,vmax=vmax)
                 mappeable = matplotlib.cm.ScalarMappable(norm=norm, cmap=cmap)
-                cbar = ax.figure.colorbar(mappeable, cax=cax, ax=ax, label="Temperature",
+                cbar = ax.figure.colorbar(mappeable, cax=cax, ax=ax, label=label,
                                           format="%.1f")
     else:
         cbar = None

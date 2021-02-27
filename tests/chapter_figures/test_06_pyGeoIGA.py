@@ -59,7 +59,7 @@ def test_create_geometry():
 
         fig.show()
 
-        save = True
+        save = False
         if save or save_all:
             fig.savefig(fig_folder + file_name, **kwargs_savefig)
 
@@ -237,6 +237,8 @@ def test_listings():
     geometry, gDoF = patch_topology(geometry)
     print(gDoF)
 
+    #from pygeoiga.analysis.iga import form_k_IGA
+
     def assemble_stiffness_matrix(geometry: dict, gDoF: int):
         """
         Args:
@@ -386,10 +388,9 @@ def test_listings():
               loc='upper left',
             bbox_to_anchor=(0.05, .9),
              borderaxespad=0)
-
+    ax1.set_ylabel(r"$y$")
     for ax in ax1, ax2, ax3:
         ax.set_aspect("equal")
-        ax.set_ylabel(r"$y$")
         ax.set_xlabel(r"$x$")
         ax.set_xlim(0,500)
         ax.set_ylim(0,500)
