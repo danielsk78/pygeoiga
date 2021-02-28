@@ -1,2 +1,2 @@
 # pygeoiga
-Combining parametric geomodeling (NURBS) with Isogeometric Analysis (IGA) for fast geothermal model construction, simulation, and adaptation
+Making sense of Isogeometric Analysis for geothermal applications: Parametric geomodeling (NURBS) for fast model construction, simulation and adaptation
