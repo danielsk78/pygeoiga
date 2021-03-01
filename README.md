@@ -17,16 +17,24 @@ Isogeometric analysis (IGA) is a technique that uses the power of the finite ele
 (FEM) to numerically solve differential equations without the need of creating a discretization
 in the space of the geometric object (i.e., a mesh). Instead, it uses computer-aided design
 (CAD) tools, specifically Non-Uniform Rational B-splines (NURBS), to accurately represent
-any geometry and perform analysis during design. This method has not been used in a Geoscientic
-context, where the geometry of subsurface structures greatly influences the solution
-of a simulation. This thesis introduces the isogeometric analysis technique to the Geoscientific 
-community providing a Python package (https://github.com/danielsk78/pygeoiga) with
-a simple but clear computer implementation. It differs from other implementations for dealing
-with multipatch structures, focusing on geological modelling with multiple subdomains.
-A series of numerical examples are presented to show the use of the technique for solving the
-two-dimensional heat conduction problem compared to the traditional FEM. Results show
-that IGA requires fewer degrees of freedom (DoF) for convergence of the solution. Additionally, 
-the Bézier extractor operator is introduced, providing an element structure that can
+any geometry and perform analysis during design. 
+
+![](docs/original.png)
+![](docs/adapted.png)
+
+This method has not been used in a Geoscientic context, where the geometry of subsurface structures greatly influences the solution
+of a simulation. This package introduces the isogeometric analysis technique in an easy language and tutorials to guide 
+the user during the construction and analysis. 
+
+![Anticline](docs/anticline.png)
+
+It differs from other implementations for dealing with multipatch structures, focusing on geological modelling with multiple subdomains.
+
+![Salt dome](docs/salt_dome.png)
+
+![Salt dome temperature field](docs/salt_dome_solution.png)
+
+Additionally, the Bézier extractor operator is introduced, providing an element structure that can
 incorporate IGA into existing finite element codes.
 
 Features
@@ -76,7 +84,6 @@ Project Development
 -------------------
 
 Author: Daniel Escallón
-
 
 
 
