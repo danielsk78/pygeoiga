@@ -99,7 +99,7 @@ def test_listings():
         knots = [knot_b, knot_m, knot_u]
 
         geometry = OrderedDict({})
-        name = ["granite", "mudstone", "sandstone"]  # type of litholgy
+        name = ["Granite", "Mudstone", "Sandstone"]  # type of litholgy
 
         for i, lith in enumerate(name):
             geometry[lith] = {"B": cpoints[i], "knots": knots[i]}
@@ -119,11 +119,11 @@ def test_listings():
         # Topology of patches -BOUNDARIES - faces of the patch in contact
         # 0: down; 1: right; 2: up; 3: left
         # Granite is in contact to mudstone in the "up" face
-        geometry["granite"]["patch_faces"] = {2: "mudstone"}
+        geometry["Granite"]["patch_faces"] = {2: "Mudstone"}
         # Mudstone is in contact to granite in the "down" face and to sandstone in the "up" face
-        geometry["mudstone"]["patch_faces"] = {0: "granite", 2: "sandstone"}
+        geometry["Mudstone"]["patch_faces"] = {0: "Granite", 2: "Sandstone"}
         # Sandstone is in contact to mudstone in the "down" face
-        geometry["sandstone"]["patch_faces"] = {0: "mudstone"}
+        geometry["Sandstone"]["patch_faces"] = {0: "Mudstone"}
 
         # Specify the face that have a boundary condition
         #geometry["granite"]["BC"] = {0: "bot_bc"}

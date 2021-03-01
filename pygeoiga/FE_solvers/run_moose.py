@@ -1,3 +1,4 @@
+import os
 from pygeoiga import myPath
 datapath = myPath+"/FE_solvers/data/"
 
@@ -80,11 +81,11 @@ def create_script(filepath,
                      "[../]\n" %kappa
 
     with open("%s.i" % filepath.split('.')[0], "w") as f:
-        #MESH
+        # MESH
         f.write("[Mesh]\n"
                 "   file = %s\n"
                 "[]\n\n"%filepath)
-        #VARIABLES AND GLOBAL PARAMS
+        # VARIABLES AND GLOBAL PARAMS
         f.write("[Variables]\n"
                 "   [./temperature]\n"
                 "   [../]\n"
@@ -92,17 +93,17 @@ def create_script(filepath,
                 "[GlobalParams]\n"
                 "   variable = temperature\n"
                 "[]\n\n")
-        #KERNELS
+        # KERNELS
         f.write("[Kernels]\n" +
                 conduction +
                 "[]\n\n")
 
-        #BOUNDARY CONDITION
+        # BOUNDARY CONDITION
         f.write("[BCs]\n"+
                 bcs +
                 "[]\n\n")
 
-        #EXECUTIONER
+        # EXECUTIONER
         f.write("[Executioner]\n"
                 "   type = Steady\n"
                 "   solve_type = 'Newton'\n"
@@ -118,5 +119,7 @@ def create_script(filepath,
                 "   print_perf_log = true\n"
                 "   execute_on = 'timestep_end'\n"
                 "[]\n\n")
+
+    return os.path.abspath("%s.i" % filepath.split('.')[0])
 
 

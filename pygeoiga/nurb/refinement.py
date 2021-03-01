@@ -56,7 +56,7 @@ def single_knot_insertion(cpoint_old, knot_old, knot_ins, degree, direction):
     for i in range(len(cpoint_old.shape)-1):
         cpoint_old[..., i] = cpoint_old[..., i] * cpoint_old[..., -1]
     # Evaluate the new control points according to the inserted knot
-    _shape = np.asarray(cpoint_old.shape)
+    _shape = np.asarray(cpoint_old.shape, dtype=object)
     _shape[direction] = _shape[direction] + 1
     B = np.zeros(_shape)
     if direction == 0:

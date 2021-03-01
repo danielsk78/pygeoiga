@@ -145,3 +145,12 @@ tests/chapter_figures/data/*.xdmf
 tests/chapter_figures/data/*.vtu
 tests/chapter_figures/data/*.vtk
 tests/chapter_figures/data/*.pvd
+
+*.msh
+*.e
+*.xml
+*.h5
+*.xdmf
+*.vtu
+*.vtk
+*.pvd

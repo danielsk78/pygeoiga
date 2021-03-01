@@ -5,16 +5,16 @@ import matplotlib
 from mpl_toolkits.mplot3d.art3d import Poly3DCollection
 #matplotlib.use('Qt5Agg')
 
-def create_figure(typ="2d"):
+def create_figure(typ="2d", figsize=(5,5)):
     if typ=="2d":
-        fig, ax = plt.subplots()
+        fig, ax = plt.subplots(figsize=figsize)
         ax.set_aspect("equal")
     elif typ=="3d":
-        fig = plt.figure()
-        ax = fig.add_subplot(111, projection='3d')
+        fig = plt.figure(figsize=figsize)
+        ax = fig.add_subplot(111,  projection='3d')
     return fig, ax
 
-def p_cpoints(cp, dim = None, ax = None, point= True, line=True, show = False, **kwargs):
+def p_cpoints(cp, dim = 2, ax = None, point= True, line=True, show = False, **kwargs):
     if ax is None:
         fig = plt.figure()
         ax = fig.add_subplot(111, projection='3d')
@@ -52,13 +52,13 @@ def p_cpoints(cp, dim = None, ax = None, point= True, line=True, show = False, *
         plt.show()
     return ax
 
-def p_knots(knots, cp, ax = None, dim = 3, point= True, line=True, show = False, resolution =25, **kwargs):
+def p_knots(knots, cp, weight=None, ax = None, dim = 2, point= True, line=True, show = False, resolution =25, **kwargs):
     from pygeoiga.engine.NURB_engine import curve_point, surface_point
     if ax is None:
         fig = plt.figure()
         ax = fig.add_subplot(111, projection='3d')
     if isinstance(knots, list) or isinstance(knots, tuple):
-        knots = np.asarray(knots)
+        knots = np.asarray(knots, dtype=object)
     if "color" not in kwargs:
         kwargs["color"] = "green"
     mkr = kwargs.pop("marker", "^")
@@ -67,7 +67,10 @@ def p_knots(knots, cp, ax = None, dim = 3, point= True, line=True, show = False,
     if knots.shape[0] == 1:
         knots=knots[0]
         degree = len(np.where(knots == 0.)[0]) - 1
-        weight = np.ones(cp.shape[0])
+        if weight is None:
+            weight = np.ones(cp.shape[0])
+        else:
+            weight = weight[...,-1]
         points = np.linspace(knots[0], knots[-1], resolution)
         if line:
             pos = []
@@ -93,7 +96,8 @@ def p_knots(knots, cp, ax = None, dim = 3, point= True, line=True, show = False,
     else:
         degree1 = len(np.where(np.asarray(knots[0]) == 0.)[0]) - 1
         degree2 = len(np.where(np.asarray(knots[1]) == 0.)[0]) - 1
-        weight = np.ones((cp.shape[0], cp.shape[1], 1))
+        if weight is None:
+            weight = np.ones((cp.shape[0], cp.shape[1], 1))
         knot1 = np.asarray(knots[0])
         knot2 = np.asarray(knots[1])
 
@@ -158,7 +162,7 @@ def p_knots(knots, cp, ax = None, dim = 3, point= True, line=True, show = False,
 
     return ax
 
-def p_curve(knots=None, cp=None, ax = None, weight= None, positions = None,  dim=3, show = False, resolution =30, **kwargs):
+def p_curve(knots=None, cp=None, ax = None, weight= None, positions = None,  dim=2, show = False, resolution =30, **kwargs):
     if ax is None:
         fig = plt.figure()
         ax = fig.add_subplot(111, projection='3d')
@@ -166,6 +170,10 @@ def p_curve(knots=None, cp=None, ax = None, weight= None, positions = None,  dim
         kwargs["color"] = "blue"
     if positions is None:
         from pygeoiga.engine.NURB_engine import NURBS_Curve
+        if isinstance(knots, list) or isinstance(knots, tuple):
+            knots = np.asarray(knots, dtype=object)
+        if knots.shape[0] == 1:
+            knots = knots[0]
         positions = np.asarray(NURBS_Curve(cp, knots, resolution, weight)).T
     if dim == 3:
         ax.plot(positions[:, 0], positions[:, 1], positions[:, 2], **kwargs)

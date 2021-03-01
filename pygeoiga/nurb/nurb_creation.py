@@ -1,5 +1,6 @@
 import traceback
 import numpy as np
+from pygeoiga.plot.nrbplotting_mpl import p_cpoints, p_knots, p_surface, create_figure, p_curve
 
 
 class NURB(object):
@@ -27,7 +28,7 @@ class NURB(object):
         self.B = np.ones((shape))
 
         if weight is not None:
-            self.B[..., -1] = weight
+            self.B[..., -1] = weight[..., -1]
 
         cpoints= np.asarray(cpoints)
         self.B[..., :-1] = cpoints
@@ -41,7 +42,7 @@ class NURB(object):
 
     @property
     def degree(self):
-        return np.asarray([len(np.where(self.knots[x] == 0.)[0]) - 1 for x in range(len(self.knots))])
+        return np.asarray([len(np.where(np.asarray(self.knots[x]) == 0.)[0]) - 1 for x in range(len(self.knots))])
 
     @property
     def shape(self):
@@ -176,6 +177,18 @@ class NURB(object):
         from pygeoiga.nurb.refinement import knot_insertion
         self.B, self.knots = knot_insertion(self.B, self.degree, self.knots, knot_ins, direction)
 
+    def degree_elevate(self, times: int =1, direction: int = 0):
+        """
+        Refinement by degree elevation
+        Args:
+            times:
+
+        Returns:
+
+        """
+        from pygeoiga.nurb.refinement import degree_elevation
+        self.B, self.knots = degree_elevation(self.B, self.knots, times=times, direction=direction)
+
     def get_basis_function(self, direction:int =0, resolution = None):
         """
         Obtain the basis functions and derivatives of the knot vector at desired direction
@@ -193,3 +206,50 @@ class NURB(object):
         return N, dN
 
 
+    def plot(self, ax=None, kwargs_surface={}, kwargs_knots={}, kwargs_cpoints={}):
+        if ax is None:
+            fig, ax = create_figure("2d", figsize=(10, 20))
+
+        ax = self.plot_surface(ax, **kwargs_surface)
+        ax = self.plot_knots(ax, **kwargs_knots)
+        ax = self.plot_cpoints(ax, **kwargs_cpoints)
+        return ax
+
+    def plot_knots(self, ax=None, **kwargs_knots):
+        if ax is None:
+            fig, ax = create_figure("2d", figsize=(10, 20))
+
+        ax = p_knots(self.knots,
+                     self.B,
+                     weight=self.weight,
+                     ax=ax,
+                     **kwargs_knots)
+        return ax
+
+    def plot_cpoints(self, ax=None, **kwargs_cpoints):
+        if ax is None:
+            fig, ax = create_figure("2d", figsize=(10, 20))
+        ax = p_cpoints(self.B,
+                       ax=ax,
+                       **kwargs_cpoints)
+        return ax
+
+    def plot_surface(self, ax=None, **kwargs_surface):
+        if ax is None:
+            fig, ax = create_figure("2d", figsize=(10, 20))
+        ax = p_surface(self.knots,
+                       self.B,
+                       weight=self.weight,
+                       ax=ax,
+                       **kwargs_surface)
+        return ax
+
+    def plot_curve(self, ax = None, **kwargs_curve):
+        if ax is None:
+            fig, ax = create_figure("2d", figsize=(10, 20))
+        ax = p_curve(self.knots,
+                     self.B,
+                     weight=self.weight,
+                     ax=ax,
+                     **kwargs_curve)
+        return ax

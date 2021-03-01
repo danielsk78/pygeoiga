@@ -53,21 +53,21 @@ def test_plot_gempy_explicit_implicit():
     gp.set_interpolator(geo_model, theano_optimizer='fast_run', verbose=[])
 
     geo_model.set_default_surfaces()
-    geo_model.add_surfaces(['surface3', 'basement'])
+    geo_model.add_surfaces(['Surface3', 'Basement'])
 
-    geo_model.add_surface_points(X=225, Y=0, Z=-94, surface='surface1')
-    geo_model.add_surface_points(X=464, Y=0, Z=-107, surface='surface1')
-    geo_model.add_surface_points(X=620, Y=0, Z=-14, surface='surface1')
+    geo_model.add_surface_points(X=225, Y=0, Z=-94, surface='Surface1')
+    geo_model.add_surface_points(X=464, Y=0, Z=-107, surface='Surface1')
+    geo_model.add_surface_points(X=620, Y=0, Z=-14, surface='Surface1')
 
-    geo_model.add_orientations(X=350, Y=0, Z=-300, surface='surface1', pole_vector=(0, 0, 1))
+    geo_model.add_orientations(X=350, Y=0, Z=-300, surface='Surface1', pole_vector=(0, 0, 1))
 
-    geo_model.add_surface_points(X=225, Y=0.01, Z=-269, surface='surface2')
-    geo_model.add_surface_points(X=464, Y=0, Z=-279, surface='surface2')
-    geo_model.add_surface_points(X=620, Y=0, Z=-123, surface='surface2')
+    geo_model.add_surface_points(X=225, Y=0.01, Z=-269, surface='Surface2')
+    geo_model.add_surface_points(X=464, Y=0, Z=-279, surface='Surface2')
+    geo_model.add_surface_points(X=620, Y=0, Z=-123, surface='Surface2')
 
-    geo_model.add_surface_points(X=225, Y=0, Z=-439, surface='surface3')
-    geo_model.add_surface_points(X=464, Y=0, Z=-446, surface='surface3')
-    geo_model.add_surface_points(X=620, Y=0, Z=-433, surface='surface3')
+    geo_model.add_surface_points(X=225, Y=0, Z=-439, surface='Surface3')
+    geo_model.add_surface_points(X=464, Y=0, Z=-446, surface='Surface3')
+    geo_model.add_surface_points(X=620, Y=0, Z=-433, surface='Surface3')
 
     geo_model.surfaces.df.color[0] = '#015482'
     geo_model.surfaces.df.color[1] = '#ffbe00'

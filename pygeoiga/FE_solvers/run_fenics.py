@@ -136,6 +136,7 @@ def run_simulation(filepath,
         matplotlib.use("Qt5Agg")
         # Plot solution and gradient
         plot(u, title="Temperature")
+        plt.gca().view_init(azim=-90, elev=90)
         plt.show()
 
     dofs = V.tabulate_dof_coordinates().reshape(V.dim(), mesh.geometry().dim()) #coordinates of nodes

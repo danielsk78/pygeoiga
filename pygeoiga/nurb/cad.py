@@ -251,7 +251,7 @@ def make_3_layer_patches(refine=False, knot_ins=[np.arange(0.1,1,0.1), np.arange
             B[i], knots[i] = knot_insertion(B[i], degree=(2, 2), knots=knots[i], knots_ins=knots_ins_1, direction=1)
 
     geometry = OrderedDict({})
-    name = ["granite", "mudstone", "sandstone"]
+    name = ["Granite", "Mudstone", "Sandstone"]
     color = ["red", "blue", "green"]
     kappa = [3.1, 0.9, 3]
     position = [(1,1),(2,1),(3,1)]
@@ -263,13 +263,13 @@ def make_3_layer_patches(refine=False, knot_ins=[np.arange(0.1,1,0.1), np.arange
     # 1: right
     # 2: up
     # 3: left
-    geometry["granite"]["patch_faces"] = {2:"mudstone"}
-    geometry["mudstone"]["patch_faces"] = {0:"granite", 2:"sandstone"}
-    geometry["sandstone"]["patch_faces"] = {0:"mudstone"}
+    geometry["Granite"]["patch_faces"] = {2:"Mudstone"}
+    geometry["Mudstone"]["patch_faces"] = {0:"Granite", 2:"Sandstone"}
+    geometry["Sandstone"]["patch_faces"] = {0:"Mudstone"}
 
     # For the meshing part. Specify the face that have a boundary condition
-    geometry["granite"]["BC"] = {0: "bot_bc"}
-    geometry["sandstone"]["BC"] = {2: "top_bc"}
+    geometry["Granite"]["BC"] = {0: "bot_bc"}
+    geometry["Sandstone"]["BC"] = {2: "top_bc"}
     return geometry
 
 def make_L_shape(refine = False, knot_ins=(np.arange(0.1,1,0.1), np.arange(0.1,1,0.1))):

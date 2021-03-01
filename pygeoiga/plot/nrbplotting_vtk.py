@@ -1,8 +1,8 @@
 import pyvista
 import numpy as np
 
-def create_figure():
-    p = pyvista.Plotter(notebook=False)
+def create_figure(notebook=False):
+    p = pyvista.Plotter(notebook=notebook)
     return p
 
 def p_cpoints(cp, p=None, show = False, **kwargs):
@@ -20,13 +20,13 @@ def p_cpoints(cp, p=None, show = False, **kwargs):
         p_show(p)
     return p
 
-def p_knots(knots, cp, p = None, show = False, resolution = 20, point=True, line=True, **kwargs):
+def p_knots(knots, cp, p = None, weight=None, show = False, resolution = 20, point=True, line=True, **kwargs):
     from pygeoiga.engine.NURB_engine import curve_point, surface_point
 
     if p is None:
         p = pyvista.Plotter(notebook=False)
-    if isinstance(knots, list):
-        knots = np.asarray(knots)
+    if isinstance(knots, list) or isinstance(knots, tuple):
+        knots = np.asarray(knots, dtype=object)
     if cp.shape[-1]==2:
         new_cp = np.zeros((cp.shape[0], cp.shape[1], 3))
         new_cp[..., :cp.shape[-1]] = cp
@@ -38,10 +38,14 @@ def p_knots(knots, cp, p = None, show = False, resolution = 20, point=True, line
     line_width = kwargs.pop("line_width", 4)
 
     if knots.shape[0] == 1:
+        knots = knots[0]
         degree = len(np.where(knots == 0.)[0]) - 1
-        weight = np.ones(cp.shape[0])
+        if weight is None:
+            weight = np.ones(cp.shape[0])
+        else:
+            weight = weight[...,-1]
+        points = np.linspace(knots[0], knots[-1], resolution)
         if line:
-            points = np.linspace(knots[0], knots[-1], resolution)
             pos = []
             for u in points:
                 pos.append(curve_point(u, degree, knots, cp, weight))
@@ -56,9 +60,10 @@ def p_knots(knots, cp, p = None, show = False, resolution = 20, point=True, line
             ptn = pyvista.PolyData(pos)
             p.add_mesh(ptn, point_size=point_size, **kwargs)
     else:
-        degree1 = len(np.where(knots[0] == 0.)[0]) - 1
-        degree2 = len(np.where(knots[1] == 0.)[0]) - 1
-        weight = np.ones((cp.shape[0], cp.shape[1], 1))
+        degree1 = len(np.where(np.asarray(knots[0]) == 0.)[0]) - 1
+        degree2 = len(np.where(np.asarray(knots[1]) == 0.)[0]) - 1
+        if weight is None:
+            weight = np.ones((cp.shape[0], cp.shape[1], 1))
         knot1 = np.asarray(knots[0])
         knot2 = np.asarray(knots[1])
 
@@ -115,12 +120,12 @@ def p_knots(knots, cp, p = None, show = False, resolution = 20, point=True, line
 
     return p
 
-def p_surface(knots, cp, interactive=True, weight = None, positions = None, p = None, resolution=20, show = False, **kwargs):
+def p_surface(knots, cp, interactive=False, weight = None, positions = None, p = None, resolution=20, show = False, **kwargs):
     from pygeoiga.engine.NURB_engine import NURBS_Surface
     if p is None:
         p = pyvista.Plotter(notebook=False)
     color = kwargs.pop("color", "blue")
-    radius = kwargs.pop("radius", 5.0)
+    radius = kwargs.pop("radius", 1.0)
     opacity = kwargs.pop("opacity", 1.0)
     if cp.shape[-1]==2:
         new_cp = np.zeros((cp.shape[0], cp.shape[1], 3))
@@ -153,5 +158,6 @@ def p_surface(knots, cp, interactive=True, weight = None, positions = None, p = 
 def p_show(p):
     #p.set_background("white")
     p.show_axes()
-    p.show_grid(color="black")
-    p.show(cpos="xy")
+    #p.show_grid(color="black")
+    p.view_xy()
+    p.show()
