@@ -5,6 +5,7 @@ from pygeoiga.nurb.nurb_creation import NURB
 from pygeoiga.plot.nrbplotting_mpl import p_cpoints, p_knots, p_surface, create_figure
 from pygeoiga.plot.solution_mpl import p_temperature
 import matplotlib.colors as mcolors
+from tqdm.autonotebook import tqdm
 
 class Multipatch(object):
     """Manage Multiple NURBS patches"""
@@ -48,7 +49,7 @@ class Multipatch(object):
     def plot_knots(self, ax=None, **kwargs_knots):
         if ax is None:
             fig, ax = create_figure("2d", figsize=(10, 20))
-        for patch_name in self.geometry.keys():
+        for patch_name in tqdm(self.geometry.keys(), desc="Plotting knots"):
             ax = p_knots(self.geometry[patch_name].get("knots"),
                          self.geometry[patch_name].get("B"),
                          weight=self.geometry[patch_name].get("weight"),
@@ -59,7 +60,7 @@ class Multipatch(object):
     def plot_cpoints(self, ax=None, **kwargs_cpoints):
         if ax is None:
             fig, ax = create_figure("2d", figsize=(10, 20))
-        for patch_name in self.geometry.keys():
+        for patch_name in tqdm(self.geometry.keys(), desc="Plotting control points"):
             ax = p_cpoints(self.geometry[patch_name].get("B"),
                            ax=ax,
                            **kwargs_cpoints)
@@ -69,7 +70,7 @@ class Multipatch(object):
         if ax is None:
             fig, ax = create_figure("2d", figsize=(10, 20))
 
-        for patch_name in self.geometry.keys():
+        for patch_name in tqdm(self.geometry.keys(), desc="Plotting surfaces"):
             ax = p_surface(self.geometry[patch_name].get("knots"),
                            self.geometry[patch_name].get("B"),
                            weight=self.geometry[patch_name].get("weight"),
@@ -88,7 +89,7 @@ class Multipatch(object):
             tmin = t.min() if t.min() < tmin else tmin
             tmax = t.max() if t.max() > tmax else tmax
 
-        for patch_name in self.geometry.keys():
+        for patch_name in tqdm(self.geometry.keys(), desc="Plotting solutions"):
             x = self.geometry[patch_name].get("x_sol")
             y = self.geometry[patch_name].get("y_sol")
             t = self.geometry[patch_name].get("t_sol")
@@ -111,7 +112,7 @@ class Multipatch(object):
         Returns:
 
         """
-        for patch_name in self.geometry.keys():
+        for patch_name in tqdm(self.geometry.keys(), desc="Inserting knots by patch"):
             self.knot_insertion_by_name(patch_name, knot_ins, direction)
         return True
 
@@ -127,7 +128,7 @@ class Multipatch(object):
 
         """
         if name in self.geometry.keys():
-            self.geometry[name].get("nrb").knot_insert(knot_ins, direction)
+            self.geometry[name].get("nrb").knot_insert(knot_ins, direction, leave=False)
             self.geometry[name]["B"] = self.geometry[name].get("nrb").B
             self.geometry[name]["knots"] = self.geometry[name].get("nrb").knots
             self.geometry[name]["weight"] = self.geometry[name].get("nrb").weight

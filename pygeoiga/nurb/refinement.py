@@ -1,8 +1,9 @@
 from pygeoiga.nurb import NURB
 import numpy as np
+from tqdm.autonotebook import tqdm
 
 
-def knot_insertion(B, degree, knots: list, knots_ins: list, direction = 0):
+def knot_insertion(B, degree, knots: list, knots_ins: list, direction = 0, leave = True):
     """
     Manage the knot insertion to refine the nurb control point mesh
     Direction eta or xi
@@ -27,7 +28,7 @@ def knot_insertion(B, degree, knots: list, knots_ins: list, direction = 0):
     knot_new = knots[direction]
     if isinstance(degree, int):
         degree=[degree]
-    for knot_ins in knots_ins:
+    for knot_ins in tqdm(knots_ins, desc="Inserting single knot", leave=leave):
         B_new, knot_new = single_knot_insertion(cpoint_old=B_new,
                                                        knot_old=knot_new,
                                                        knot_ins=knot_ins,

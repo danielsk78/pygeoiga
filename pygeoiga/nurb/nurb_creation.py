@@ -164,18 +164,19 @@ class NURB(object):
 
         return nrb
 
-    def knot_insert(self, knot_ins: list, direction:int = 0):
+    def knot_insert(self, knot_ins: list, direction:int = 0, leave=True):
         """
         Refinement by knot insertion
         Args:
             knot_ins: list of knots to insert
             direction: parametric direction to insert them
+            leave: Show or hide progress bar after completion
 
         Returns:
 
         """
         from pygeoiga.nurb.refinement import knot_insertion
-        self.B, self.knots = knot_insertion(self.B, self.degree, self.knots, knot_ins, direction)
+        self.B, self.knots = knot_insertion(self.B, self.degree, self.knots, knot_ins, direction, leave=leave)
 
     def degree_elevate(self, times: int =1, direction: int = 0):
         """

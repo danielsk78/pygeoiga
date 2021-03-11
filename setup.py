@@ -17,7 +17,8 @@ setup(
         'PyQt5',
         'pygmsh==6.1.1',
         'gmsh',
-        'meshio==4.0.3'
+        'meshio==4.0.3',
+        'tqdm'
 
     ],
     url='https://github.com/danielsk78/master_thesis_IGA-Geothermal-Modeling',

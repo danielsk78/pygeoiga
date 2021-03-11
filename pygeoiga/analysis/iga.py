@@ -1,4 +1,5 @@
 import numpy as np
+from tqdm.autonotebook import tqdm
 from pygeoiga.analysis.common import gauss_points, map_nodes
 from pygeoiga.engine.NURB_engine import basis_function_point
 
@@ -105,12 +106,15 @@ def form_k_IGA(K_glb, IEN, P, kappa, nx, ny, degree, knots=None):
     #xi_ve = knot_save[0][degree:-degree]#*nx
     #eta_ve = knot_save[1][degree:-degree]#*ny
     e = 0
+    #for i in tqdm(range(ny), desc="Loop row elements", leave=False):
     for i in range(ny):
+        #for j in tqdm(range(nx), desc="Loop column elements in row %s"%i, leave=False):
         for j in range(nx):
             IEN_e = IEN[e] # Element topology of current element
             eDOF = IEN_e
             #kappa_e = kappa_element[e]
             k = 0
+            #for g in tqdm(range(len(G)), desc="Loop gauss points in element %s, %s"%(i,j), leave=False):
             for g in range(len(G)):
                 xi_n = G[g, 0]
                 eta_n = G[g, 1]

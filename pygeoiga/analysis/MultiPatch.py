@@ -1,6 +1,8 @@
 from pygeoiga.analysis.common import IEN_element_topology
 from pygeoiga.analysis.iga import map_solution_elements
 import numpy as np
+from tqdm.autonotebook import tqdm
+
 
 def patch_topology(geometry):
     """
@@ -201,7 +203,7 @@ def form_k_IGA_mp(geometry, K_glob):
     """
     from pygeoiga.analysis.iga import form_k_IGA
     # form the stiffness matrix
-    for patch_id in geometry.keys():
+    for patch_id in tqdm(geometry.keys(), desc="Assembling global stiffness matrix"):
         pDof = geometry[patch_id].get("patch_DOF")
         K = np.zeros((pDof, pDof))  # stiffness matrix size
 
@@ -297,7 +299,7 @@ def boundary_condition_mp(geometry, D, T_t, T_b, T_l, T_r):
 def bezier_extraction_mp(geometry):
     from pygeoiga.analysis.bezier_extraction import bezier_extraction_operator_bivariate, bezier_extraction_operator
 
-    for patch_id in geometry.keys():
+    for patch_id in tqdm(geometry.keys(), desc="Bezier extraction per patch"):
         knots = geometry[patch_id].get("knots")
         degree = geometry[patch_id].get("degree")
         n_xi, n_eta = geometry[patch_id].get("n_element")
@@ -324,7 +326,7 @@ def form_k_bezier_mp(geometry, K_glob):
     """
     from pygeoiga.analysis.bezier_FE import form_k
     #K_glob = np.zeros((gDoF, gDoF))
-    for patch_id in geometry.keys():
+    for patch_id in tqdm(geometry.keys(), desc="Assembling global stiffness matrix"):
         pDof = geometry[patch_id].get("patch_DOF")  # Degrees of freedom per patch
         nx, ny = geometry[patch_id].get("n_element")  # number of elements in parametric space
         nel = nx * ny  # total number of elements
@@ -364,7 +366,7 @@ def map_MP_elements(geometry, D):
 
     """
     from pygeoiga.analysis.bezier_FE import map_bezier_elements
-    for patch_id in geometry.keys():
+    for patch_id in tqdm(geometry.keys(), desc="Mapping solutions to patch"):
         degree, _ = geometry[patch_id].get("degree")
         P = geometry[patch_id].get("list_cp")
         nx, ny = geometry[patch_id].get("n_element")
