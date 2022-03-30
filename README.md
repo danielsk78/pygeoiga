@@ -96,11 +96,11 @@ Escallon, D., Degen, D., Moulaeifard, s. M., and Wellmann, F.: Making sense of I
 Or directly use the BibTex
 ```
 @article{Escallon_2022,	
-    doi = {10.5194/egusphere-egu22-2436},	
-       url = {https://doi.org/10.5194%2Fegusphere-egu22-2436},	
-       year = 2022,	
-       month = {mar},	
-       publisher = {Copernicus {GmbH}},	
-       author = {Daniel Escallon and Denise Degen and s.Mohammad Moulaeifard and Florian Wellmann},	
-       title = {Making sense of Isogeometric Analysis for geothermal applications: Parametric geomodelling ({NURBS}) for fast model construction, simulation and adaptation}}
+    `doi = {10.5194/egusphere-egu22-2436},	
+    url = {https://doi.org/10.5194%2Fegusphere-egu22-2436},	
+    year = 2022,	
+    month = {mar},	
+    publisher = {Copernicus {GmbH}},	
+    author = {Daniel Escallon and Denise Degen and s.Mohammad Moulaeifard and Florian Wellmann},	
+    title = {Making sense of Isogeometric Analysis for geothermal applications: Parametric geomodelling ({NURBS}) for fast model construction, simulation and adaptation}}
 ```
