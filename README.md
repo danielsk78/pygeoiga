@@ -92,3 +92,15 @@ Citation
 If you use pyGeoIGA in a scientific abstract or publication, please include appropriate recognition of the original work. For the time being, please cite the publication in the conference abstract:
 
 Escallon, D., Degen, D., Moulaeifard, s. M., and Wellmann, F.: Making sense of Isogeometric Analysis for geothermal applications: Parametric geomodelling (NURBS) for fast model construction, simulation and adaptation, EGU General Assembly 2022, Vienna, Austria, 23–27 May 2022, EGU22-2436, https://doi.org/10.5194/egusphere-egu22-2436, 2022. 
+
+Or directly use the BibTex
+```
+@article{Escallon_2022,	
+    doi = {10.5194/egusphere-egu22-2436},	
+       url = {https://doi.org/10.5194%2Fegusphere-egu22-2436},	
+       year = 2022,	
+       month = {mar},	
+       publisher = {Copernicus {GmbH}},	
+       author = {Daniel Escallon and Denise Degen and s.Mohammad Moulaeifard and Florian Wellmann},	
+       title = {Making sense of Isogeometric Analysis for geothermal applications: Parametric geomodelling ({NURBS}) for fast model construction, simulation and adaptation}}
+```
