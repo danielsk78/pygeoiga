@@ -1,3 +1,4 @@
+[![DOI](https://zenodo.org/badge/339695886.svg)](https://zenodo.org/badge/latestdoi/339695886)
 # pyGeoIGA
 ### Making sense of Isogeometric Analysis for geothermal applications: Parametric geomodeling (NURBS) for fast model construction, simulation and adaptation
 
